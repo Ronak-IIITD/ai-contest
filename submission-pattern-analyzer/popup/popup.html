@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Submission Pattern Analyzer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <h1>Submission Pattern Analyzer</h1>
+      <p id="contestLabel" class="muted">Detecting contest…</p>
+
+      <section class="card" id="summaryCard">
+        <h2>Summary</h2>
+        <div id="summaryContent">No data yet</div>
+        <p id="freshness" class="muted"></p>
+        <p id="statusNote" class="status-note" hidden></p>
+      </section>
+
+      <section class="card">
+        <h2>Top 10 Suspicious</h2>
+        <ol id="topList" class="top-list"></ol>
+      </section>
+
+      <section class="card controls">
+        <label class="row">
+          <span>Enable overlay</span>
+          <input id="overlayToggle" type="checkbox" />
+        </label>
+        <div class="row actions">
+          <button id="refreshBtn" type="button">Refresh now</button>
+          <button id="settingsBtn" type="button">Settings</button>
+        </div>
+        <p id="actionError" class="error-text" hidden></p>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+  </html>

@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Submission Pattern Analyzer",
+  "description": "Real-time heuristic risk overlays for competitive programming contests.",
+  "version": "1.0.0",
+  "permissions": [
+    "alarms",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://codeforces.com/*",
+    "https://leetcode.com/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Submission Pattern Analyzer",
+    "default_popup": "popup/popup.html"
+  },
+  "options_page": "settings/settings.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://codeforces.com/contest/*/standings*"
+      ],
+      "js": [
+        "content-scripts/codeforces-overlay.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://leetcode.com/contest/*/ranking*"
+      ],
+      "js": [
+        "content-scripts/leetcode-overlay.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

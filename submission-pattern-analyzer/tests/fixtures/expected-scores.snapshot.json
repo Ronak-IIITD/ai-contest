@@ -1,0 +1,12 @@
+{
+  "u1": { "total": 75, "tier": "high", "flags": ["H1", "H3", "H4"] },
+  "u2": { "total": 45, "tier": "medium", "flags": ["H2", "H3"] },
+  "u3": { "total": 20, "tier": "low", "flags": ["H3"] },
+  "u4": { "total": 20, "tier": "low", "flags": ["H3"] },
+  "u5": { "total": 20, "tier": "low", "flags": ["H3"] },
+  "u6": { "total": 20, "tier": "low", "flags": ["H5"] },
+  "u7": { "total": 0, "tier": "low", "flags": [] },
+  "u8": { "total": 0, "tier": "low", "flags": [] },
+  "u9": { "total": 0, "tier": "low", "flags": [] },
+  "u10": { "total": 0, "tier": "low", "flags": [] }
+}

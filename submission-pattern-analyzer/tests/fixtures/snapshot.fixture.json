@@ -1,0 +1,132 @@
+{
+  "contestId": "1234",
+  "platform": "codeforces",
+  "problems": [
+    { "id": "A", "rating": 800 },
+    { "id": "B", "rating": 1200 },
+    { "id": "C", "rating": 1700 }
+  ],
+  "rows": [
+    {
+      "handle": "u1",
+      "rank": 1,
+      "rating": 1400,
+      "solveCount": 3,
+      "penalty": 0,
+      "totalSubmissions": 5,
+      "solves": [
+        { "problemId": "A", "solveTime": 100, "attempts": 1 },
+        { "problemId": "B", "solveTime": 280, "attempts": 1 },
+        { "problemId": "C", "solveTime": 600, "attempts": 1 }
+      ],
+      "history": {
+        "solveTimes": [1500, 1400, 1600, 1700, 1500],
+        "ratingDeltas": []
+      }
+    },
+    {
+      "handle": "u2",
+      "rank": 2,
+      "rating": 1000,
+      "solveCount": 1,
+      "penalty": 0,
+      "totalSubmissions": 50,
+      "solves": [
+        { "problemId": "C", "solveTime": 610, "attempts": 1 }
+      ],
+      "history": {
+        "ratingDeltas": [-120, -100, -90, -110, -80, -95]
+      }
+    },
+    {
+      "handle": "u3",
+      "rank": 3,
+      "rating": 1300,
+      "solveCount": 1,
+      "penalty": 0,
+      "totalSubmissions": 70,
+      "solves": [
+        { "problemId": "C", "solveTime": 620, "attempts": 1 }
+      ],
+      "history": {}
+    },
+    {
+      "handle": "u4",
+      "rank": 4,
+      "rating": 1250,
+      "solveCount": 1,
+      "penalty": 0,
+      "totalSubmissions": 20,
+      "solves": [
+        { "problemId": "C", "solveTime": 625, "attempts": 1 }
+      ],
+      "history": {}
+    },
+    {
+      "handle": "u5",
+      "rank": 5,
+      "rating": 1350,
+      "solveCount": 1,
+      "penalty": 0,
+      "totalSubmissions": 40,
+      "solves": [
+        { "problemId": "C", "solveTime": 630, "attempts": 1 }
+      ],
+      "history": {}
+    },
+    {
+      "handle": "u6",
+      "rank": 6,
+      "rating": 1500,
+      "solveCount": 3,
+      "penalty": 0,
+      "totalSubmissions": 100,
+      "solves": [
+        { "problemId": "A", "solveTime": 900, "attempts": 1 },
+        { "problemId": "B", "solveTime": 1080, "attempts": 1 },
+        { "problemId": "C", "solveTime": 1280, "attempts": 1 }
+      ],
+      "history": {}
+    },
+    {
+      "handle": "u7",
+      "rank": 7,
+      "rating": 1600,
+      "solveCount": 0,
+      "penalty": 0,
+      "totalSubmissions": 100,
+      "solves": [],
+      "history": {}
+    },
+    {
+      "handle": "u8",
+      "rank": 8,
+      "rating": 1700,
+      "solveCount": 0,
+      "penalty": 0,
+      "totalSubmissions": 100,
+      "solves": [],
+      "history": {}
+    },
+    {
+      "handle": "u9",
+      "rank": 9,
+      "rating": 1100,
+      "solveCount": 0,
+      "penalty": 0,
+      "totalSubmissions": 100,
+      "solves": [],
+      "history": {}
+    },
+    {
+      "handle": "u10",
+      "rank": 10,
+      "rating": 900,
+      "solveCount": 0,
+      "penalty": 0,
+      "totalSubmissions": 100,
+      "solves": [],
+      "history": {}
+    }
+  ]
+}

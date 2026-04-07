@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SPA Settings</title>
+    <style>
+      body {
+        font-family: Inter, system-ui, sans-serif;
+        margin: 24px;
+        max-width: 720px;
+      }
+      h1 { margin-top: 0; }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 120px;
+        gap: 10px 14px;
+        align-items: center;
+      }
+      .card {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+      .row { display: flex; align-items: center; gap: 8px; }
+      .muted { color: #6b7280; font-size: 12px; }
+      button { padding: 8px 12px; }
+      #status { margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <h1>Submission Pattern Analyzer — Settings</h1>
+
+    <section class="card">
+      <div class="grid">
+        <label for="autoScanCodeforces">Auto-scan Codeforces</label>
+        <input id="autoScanCodeforces" type="checkbox" />
+
+        <label for="autoScanLeetCode">Auto-scan LeetCode</label>
+        <input id="autoScanLeetCode" type="checkbox" />
+
+        <label for="scanIntervalSeconds">Scan interval (30-300s)</label>
+        <input id="scanIntervalSeconds" type="number" min="30" max="300" />
+
+        <label for="minTierToShowBadge">Min tier to show badge</label>
+        <select id="minTierToShowBadge">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+
+        <label for="storageRetentionDays">Storage retention (days)</label>
+        <input id="storageRetentionDays" type="number" min="1" max="30" />
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Heuristic Weights (0-50)</h2>
+      <div class="grid">
+        <label for="weightH1">H-1 Solve Speed</label>
+        <input id="weightH1" type="number" min="0" max="50" />
+
+        <label for="weightH2">H-2 Rating Jump</label>
+        <input id="weightH2" type="number" min="0" max="50" />
+
+        <label for="weightH3">H-3 Cluster</label>
+        <input id="weightH3" type="number" min="0" max="50" />
+
+        <label for="weightH4">H-4 Dormant Surge</label>
+        <input id="weightH4" type="number" min="0" max="50" />
+
+        <label for="weightH5">H-5 Rapid Multi-Solve</label>
+        <input id="weightH5" type="number" min="0" max="50" />
+      </div>
+    </section>
+
+    <div class="row">
+      <button id="saveBtn" type="button">Save settings</button>
+      <span id="status" class="muted"></span>
+    </div>
+
+    <script type="module" src="settings.js"></script>
+  </body>
+  </html>
