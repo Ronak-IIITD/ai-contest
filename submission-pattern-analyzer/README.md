@@ -188,10 +188,12 @@ submission-pattern-analyzer/
 npm test
 ```
 
-16 tests covering:
+32 tests covering:
 - Heuristic detection (H1-H5)
 - Scorer pipeline
 - Hybrid ML scoring modes
+- Settings normalization
+- ML feature extraction + runtime safeguards
 - Fetcher pagination + partial metadata
 - HTTP retry policy
 

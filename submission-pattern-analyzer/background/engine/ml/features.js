@@ -4,6 +4,7 @@ function clamp(value, min = 0, max = 1) {
 }
 
 function hasFlag(flags, heuristic) {
+  if (!Array.isArray(flags)) return false;
   return flags.some((f) => f?.heuristic === heuristic);
 }
 

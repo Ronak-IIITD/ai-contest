@@ -98,3 +98,39 @@ test('low-confidence fallback uses heuristic total', async () => {
   assert.equal(u2.ml.confidence < 0.9, true);
   assert.equal(u2.total, u2.heuristicTotal);
 });
+
+test('ml disabled keeps heuristic totals and does not add ML flag', async () => {
+  const snapshot = await loadJson('fixtures/snapshot.fixture.json');
+  const { scores } = scoreSnapshot(snapshot, baseSettings({ ml: { enabled: false, mode: 'hybrid' } }));
+
+  for (const entry of scores.values()) {
+    assert.equal(entry.total, entry.heuristicTotal);
+    assert.equal(entry.ml.enabled, false);
+    assert.equal(entry.flags.some((f) => f.heuristic === 'ML'), false);
+  }
+});
+
+test('hybrid blend boundaries use heuristic at 0 and ML score at 1', async () => {
+  const snapshot = await loadJson('fixtures/snapshot.fixture.json');
+  const handle = 'u2';
+
+  const blend0 = scoreSnapshot(snapshot, baseSettings({ ml: { mode: 'hybrid', blend: 0, minConfidenceToApply: 0 } })).scores.get(handle);
+  const blend1 = scoreSnapshot(snapshot, baseSettings({ ml: { mode: 'hybrid', blend: 1, minConfidenceToApply: 0 } })).scores.get(handle);
+
+  assert.equal(blend0.total, blend0.heuristicTotal);
+  assert.equal(blend1.total, blend1.ml.score);
+});
+
+test('hybrid mode falls back to heuristic score when confidence is below threshold', async () => {
+  const snapshot = await loadJson('fixtures/snapshot.fixture.json');
+  const { scores } = scoreSnapshot(snapshot, baseSettings({ ml: { mode: 'hybrid', blend: 1, minConfidenceToApply: 0.9 } }));
+
+  const u1 = scores.get('u1');
+  const u2 = scores.get('u2');
+
+  assert.equal(u1.ml.confidence >= 0.9, true);
+  assert.equal(u1.total, u1.ml.score);
+
+  assert.equal(u2.ml.confidence < 0.9, true);
+  assert.equal(u2.total, u2.heuristicTotal);
+});
