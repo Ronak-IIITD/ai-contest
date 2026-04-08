@@ -3,7 +3,7 @@
 AI-powered cheating detection overlay for competitive programming contest leaderboards.
 
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-blue?logo=google-chrome)
-![Version](https://img.shields.io/badge/version-1.0.0-green)
+![Version](https://img.shields.io/badge/version-1.1.0-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
 > **Risk is not a verdict.** This extension surfaces suspicion signals, not automated verdicts. All detection is explainable, and users can judge signal quality themselves.
@@ -58,6 +58,18 @@ The current scoring engine uses 5 heuristic rules:
 Final score = sum of triggered weights (capped at 100).
 
 **Note**: H4 is skipped when lifetime submission data is unavailable, avoiding false positives from implicit zeros.
+
+## v1.1 Hybrid ML foundation
+
+v1.1 adds a practical local ML-style layer on top of the existing H1-H5 heuristics.
+
+- **Local deterministic model**: lightweight built-in linear/logistic scoring with bounded normalized features
+- **No external inference service**: no network calls, no additional dependencies
+- **Mode behavior**:
+  - `heuristic`: final score = heuristic total
+  - `hybrid`: final score = blended heuristic + ML score
+  - `ml-only`: final score = ML score
+- **Confidence fallback**: in `hybrid`/`ml-only`, if model confidence is below configured threshold, per-user score falls back to heuristic total
 
 ---
 
@@ -142,6 +154,10 @@ submission-pattern-analyzer/
 │   └── engine/
 │       ├── scorer.js          # Heuristic scoring pipeline
 │       ├── store.js           # Storage abstraction
+│       ├── ml/                # Deterministic local ML layer
+│       │   ├── model-pack.js
+│       │   ├── features.js
+│       │   └── runtime.js
 │       └── heuristics/        # H1-H5 detection modules
 ├── content-scripts/
 │   ├── codeforces-overlay.js  # CF leaderboard badge injection
@@ -172,9 +188,10 @@ submission-pattern-analyzer/
 npm test
 ```
 
-12 tests covering:
+16 tests covering:
 - Heuristic detection (H1-H5)
 - Scorer pipeline
+- Hybrid ML scoring modes
 - Fetcher pagination + partial metadata
 - HTTP retry policy
 

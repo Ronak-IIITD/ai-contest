@@ -12,6 +12,12 @@ export const DEFAULT_SETTINGS = {
   minTierToShowBadge: 'low',
   storageRetentionDays: 7,
   overlayEnabled: true,
+  ml: {
+    enabled: true,
+    mode: 'hybrid',
+    blend: 0.35,
+    minConfidenceToApply: 0.4,
+  },
 };
 
 function clone(value) {
@@ -59,5 +65,19 @@ export function normalizeSettings(input = {}) {
   merged.autoScanCodeforces = Boolean(merged.autoScanCodeforces);
   merged.autoScanLeetCode = Boolean(merged.autoScanLeetCode);
   merged.overlayEnabled = Boolean(merged.overlayEnabled);
+
+  merged.ml = isPlainObject(merged.ml) ? merged.ml : clone(DEFAULT_SETTINGS.ml);
+  merged.ml.enabled = Boolean(merged.ml.enabled);
+  if (!['heuristic', 'hybrid', 'ml-only'].includes(merged.ml.mode)) {
+    merged.ml.mode = DEFAULT_SETTINGS.ml.mode;
+  }
+  merged.ml.blend = clampNumber(merged.ml.blend, 0, 1, DEFAULT_SETTINGS.ml.blend);
+  merged.ml.minConfidenceToApply = clampNumber(
+    merged.ml.minConfidenceToApply,
+    0,
+    1,
+    DEFAULT_SETTINGS.ml.minConfidenceToApply,
+  );
+
   return merged;
 }

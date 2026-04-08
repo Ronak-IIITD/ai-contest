@@ -11,6 +11,10 @@ const refs = {
   weightH3: document.getElementById('weightH3'),
   weightH4: document.getElementById('weightH4'),
   weightH5: document.getElementById('weightH5'),
+  mlEnabled: document.getElementById('mlEnabled'),
+  mlMode: document.getElementById('mlMode'),
+  mlBlend: document.getElementById('mlBlend'),
+  mlMinConfidence: document.getElementById('mlMinConfidence'),
   saveBtn: document.getElementById('saveBtn'),
   status: document.getElementById('status'),
 };
@@ -50,6 +54,11 @@ function fillForm(settings) {
   refs.weightH3.value = settings.weights.H3;
   refs.weightH4.value = settings.weights.H4;
   refs.weightH5.value = settings.weights.H5;
+
+  refs.mlEnabled.checked = settings.ml.enabled;
+  refs.mlMode.value = settings.ml.mode;
+  refs.mlBlend.value = settings.ml.blend;
+  refs.mlMinConfidence.value = settings.ml.minConfidenceToApply;
 }
 
 function readForm() {
@@ -65,6 +74,12 @@ function readForm() {
       H3: refs.weightH3.value,
       H4: refs.weightH4.value,
       H5: refs.weightH5.value,
+    },
+    ml: {
+      enabled: refs.mlEnabled.checked,
+      mode: refs.mlMode.value,
+      blend: refs.mlBlend.value,
+      minConfidenceToApply: refs.mlMinConfidence.value,
     },
   });
 }

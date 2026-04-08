@@ -75,6 +75,28 @@
       </div>
     </section>
 
+    <section class="card">
+      <h2>ML Scoring</h2>
+      <div class="grid">
+        <label for="mlEnabled">Enable ML layer</label>
+        <input id="mlEnabled" type="checkbox" />
+
+        <label for="mlMode">Scoring mode</label>
+        <select id="mlMode">
+          <option value="heuristic">Heuristic only</option>
+          <option value="hybrid">Hybrid</option>
+          <option value="ml-only">ML only</option>
+        </select>
+
+        <label for="mlBlend">Hybrid blend (0-1)</label>
+        <input id="mlBlend" type="number" min="0" max="1" step="0.05" />
+
+        <label for="mlMinConfidence">Min confidence (0-1)</label>
+        <input id="mlMinConfidence" type="number" min="0" max="1" step="0.05" />
+      </div>
+      <div class="muted">Low-confidence ML output falls back to heuristic score per user.</div>
+    </section>
+
     <div class="row">
       <button id="saveBtn" type="button">Save settings</button>
       <span id="status" class="muted"></span>

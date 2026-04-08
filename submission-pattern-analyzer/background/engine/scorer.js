@@ -3,6 +3,10 @@ import { detectRatingJump } from './heuristics/rating-jump.js';
 import { detectSubmissionClusters } from './heuristics/cluster.js';
 import { detectDormantSurge } from './heuristics/dormant.js';
 import { detectRapidSolve } from './heuristics/rapid-solve.js';
+import { normalizeSettings } from '../../shared/settings.js';
+import { MODEL_PACK } from './ml/model-pack.js';
+import { extractMlFeatures } from './ml/features.js';
+import { scoreWithModel } from './ml/runtime.js';
 
 function tierFromTotal(total) {
   if (total >= 61) return 'high';
@@ -18,25 +22,86 @@ function addFlag(map, handle, flag) {
   map.get(handle).push(flag);
 }
 
-function buildRiskScore(handle, flags, now) {
-  const total = Math.min(100, flags.reduce((sum, f) => sum + (Number(f.weight) || 0), 0));
+function clamp(value, min, max) {
+  if (!Number.isFinite(value)) return min;
+  return Math.max(min, Math.min(max, value));
+}
+
+function buildRiskScore(handle, flags, now, row, snapshot, settings) {
+  const heuristicTotal = Math.min(100, flags.reduce((sum, f) => sum + (Number(f.weight) || 0), 0));
+  const mlSettings = settings.ml;
+
+  let ml = {
+    enabled: Boolean(mlSettings?.enabled),
+    mode: mlSettings?.mode ?? 'heuristic',
+    modelVersion: null,
+    probability: null,
+    score: null,
+    confidence: null,
+    topFactors: [],
+  };
+
+  let total = heuristicTotal;
+  let mlDetail = null;
+
+  if (ml.enabled) {
+    const features = extractMlFeatures({ snapshot, row, heuristicTotal, flags });
+    const mlRun = scoreWithModel(features, MODEL_PACK);
+    const minConfidence = clamp(Number(mlSettings?.minConfidenceToApply ?? 0), 0, 1);
+    const hasConfidence = Number(mlRun.confidence) >= minConfidence;
+    const mode = ml.mode;
+    const blend = clamp(Number(mlSettings?.blend ?? 0), 0, 1);
+
+    if (mode === 'ml-only') {
+      total = hasConfidence ? mlRun.mlScore : heuristicTotal;
+    } else if (mode === 'hybrid') {
+      total = hasConfidence ? Math.round((1 - blend) * heuristicTotal + blend * mlRun.mlScore) : heuristicTotal;
+    } else {
+      total = heuristicTotal;
+    }
+
+    const topNames = mlRun.topFactors.map((f) => f.feature).slice(0, 2).join(', ');
+    mlDetail = `ML risk ${mlRun.mlScore} (p=${mlRun.probability.toFixed(2)}, conf=${mlRun.confidence.toFixed(2)})${
+      topNames ? ` via ${topNames}` : ''
+    }`;
+
+    ml = {
+      enabled: true,
+      mode,
+      modelVersion: mlRun.modelVersion,
+      probability: mlRun.probability,
+      score: mlRun.mlScore,
+      confidence: mlRun.confidence,
+      topFactors: mlRun.topFactors,
+    };
+  }
+
+  if (ml.enabled && ml.mode !== 'heuristic' && mlDetail) {
+    flags = [...flags, { heuristic: 'ML', weight: 0, detail: mlDetail }];
+  }
+
+  total = clamp(Math.round(total), 0, 100);
+
   return {
     handle,
     total,
     tier: tierFromTotal(total),
     flags,
+    heuristicTotal,
+    ml,
     updatedAt: now,
   };
 }
 
 export function scoreSnapshot(snapshot, settings = {}) {
+  const normalized = normalizeSettings(settings);
   const rows = Array.isArray(snapshot?.rows) ? snapshot.rows : [];
   const weights = {
-    H1: Number(settings?.weights?.H1 ?? 30),
-    H2: Number(settings?.weights?.H2 ?? 25),
-    H3: Number(settings?.weights?.H3 ?? 35),
-    H4: Number(settings?.weights?.H4 ?? 25),
-    H5: Number(settings?.weights?.H5 ?? 20),
+    H1: Number(normalized?.weights?.H1 ?? 30),
+    H2: Number(normalized?.weights?.H2 ?? 25),
+    H3: Number(normalized?.weights?.H3 ?? 35),
+    H4: Number(normalized?.weights?.H4 ?? 25),
+    H5: Number(normalized?.weights?.H5 ?? 20),
   };
 
   const userFlags = new Map();
@@ -61,7 +126,7 @@ export function scoreSnapshot(snapshot, settings = {}) {
 
   for (const row of rows) {
     const flags = userFlags.get(row.handle) ?? [];
-    scores.set(row.handle, buildRiskScore(row.handle, flags, now));
+    scores.set(row.handle, buildRiskScore(row.handle, flags, now, row, snapshot, normalized));
   }
 
   return {

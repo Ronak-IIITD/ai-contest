@@ -25,6 +25,12 @@ test('scoreSnapshot matches fixture snapshot', async () => {
       H4: 25,
       H5: 20,
     },
+    ml: {
+      enabled: true,
+      mode: 'heuristic',
+      blend: 0.35,
+      minConfidenceToApply: 0.4,
+    },
   });
 
   const actual = {};
