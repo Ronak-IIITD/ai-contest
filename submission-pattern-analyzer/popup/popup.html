@@ -8,13 +8,37 @@
   </head>
   <body>
     <main class="popup">
-      <h1>Submission Pattern Analyzer</h1>
-      <p id="contestLabel" class="muted">Detecting contest…</p>
+      <header class="popup-header">
+        <div class="logo">🛡️</div>
+        <h1>Pattern Analyzer</h1>
+      </header>
+
+      <p id="contestLabel" class="contest-label">
+        <span class="platform-badge" id="platformBadge">-</span>
+        <span id="contestIdText">Detecting contest…</span>
+      </p>
 
       <section class="card" id="summaryCard">
         <h2>Summary</h2>
-        <div id="summaryContent">No data yet</div>
-        <p id="freshness" class="muted"></p>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value" id="statTotal">-</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat-item low">
+            <span class="stat-value" id="statLow">-</span>
+            <span class="stat-label">Low</span>
+          </div>
+          <div class="stat-item medium">
+            <span class="stat-value" id="statMedium">-</span>
+            <span class="stat-label">Med</span>
+          </div>
+          <div class="stat-item high">
+            <span class="stat-value" id="statHigh">-</span>
+            <span class="stat-label">High</span>
+          </div>
+        </div>
+        <p id="freshness" class="freshness"></p>
         <p id="statusNote" class="status-note" hidden></p>
       </section>
 
@@ -24,13 +48,16 @@
       </section>
 
       <section class="card controls">
-        <label class="row">
+        <div class="row">
           <span>Enable overlay</span>
-          <input id="overlayToggle" type="checkbox" />
-        </label>
+          <label class="toggle-switch">
+            <input id="overlayToggle" type="checkbox" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
         <div class="row actions">
-          <button id="refreshBtn" type="button">Refresh now</button>
-          <button id="settingsBtn" type="button">Settings</button>
+          <button id="refreshBtn" type="button" class="primary">↻ Refresh</button>
+          <button id="settingsBtn" type="button">⚙️ Settings</button>
         </div>
         <p id="actionError" class="error-text" hidden></p>
       </section>
@@ -38,4 +65,4 @@
 
     <script src="popup.js"></script>
   </body>
-  </html>
+</html>

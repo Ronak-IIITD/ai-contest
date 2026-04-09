@@ -1,8 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Submission Pattern Analyzer",
-  "description": "Real-time heuristic risk overlays for competitive programming contests.",
+  "description": "AI-powered cheating detection overlay for competitive programming contests. Real-time risk scoring for Codeforces & LeetCode.",
   "version": "1.1.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png",
+    "128x128": "icons/icon128.png"
+  },
   "permissions": [
     "alarms",
     "storage",
@@ -18,7 +25,11 @@
   },
   "action": {
     "default_title": "Submission Pattern Analyzer",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
   },
   "options_page": "settings/settings.html",
   "content_scripts": [

@@ -1,4 +1,6 @@
 const contestLabel = document.getElementById('contestLabel');
+const platformBadge = document.getElementById('platformBadge');
+const contestIdText = document.getElementById('contestIdText');
 const summaryContent = document.getElementById('summaryContent');
 const freshness = document.getElementById('freshness');
 const statusNote = document.getElementById('statusNote');
@@ -7,6 +9,11 @@ const overlayToggle = document.getElementById('overlayToggle');
 const refreshBtn = document.getElementById('refreshBtn');
 const settingsBtn = document.getElementById('settingsBtn');
 const actionError = document.getElementById('actionError');
+
+const statTotal = document.getElementById('statTotal');
+const statLow = document.getElementById('statLow');
+const statMedium = document.getElementById('statMedium');
+const statHigh = document.getElementById('statHigh');
 
 function sendRuntimeMessage(message) {
   return new Promise((resolve, reject) => {
@@ -29,7 +36,7 @@ function storageGet(keys) {
 }
 
 function formatFreshness(ts) {
-  if (!Number.isFinite(ts)) return 'No timestamp available';
+  if (!Number.isFinite(ts)) return '';
   return `Updated ${new Date(ts).toLocaleTimeString()}`;
 }
 
@@ -50,7 +57,7 @@ function showActionError(message = '') {
 function showStatus(status) {
   if (!status || (!status.stale && !status.isPartial && !status.partial)) {
     statusNote.hidden = true;
-    statusNote.classList.remove('error');
+    statusNote.classList.remove('warning', 'error');
     statusNote.textContent = '';
     return;
   }
@@ -58,6 +65,7 @@ function showStatus(status) {
   const isError = Boolean(status.stale);
   statusNote.hidden = false;
   statusNote.classList.toggle('error', isError);
+  statusNote.classList.toggle('warning', !isError);
 
   if (status.message) {
     statusNote.textContent = status.message;
@@ -68,9 +76,9 @@ function showStatus(status) {
     const fetched = Number(status.fetchedRows);
     const total = Number(status.totalRows);
     if (Number.isFinite(fetched) && Number.isFinite(total)) {
-      statusNote.textContent = `Partial data (${fetched}/${total} rows fetched)`;
+      statusNote.textContent = `⚠️ Partial data (${fetched}/${total} rows fetched)`;
     } else {
-      statusNote.textContent = 'Partial data detected';
+      statusNote.textContent = '⚠️ Partial data detected';
     }
   }
 }
@@ -84,9 +92,15 @@ function renderTop(values = []) {
     topList.appendChild(li);
     return;
   }
-  for (const score of sorted) {
+  for (let i = 0; i < sorted.length; i++) {
+    const score = sorted[i];
     const li = document.createElement('li');
-    li.textContent = `${score.handle}: ${score.total} (${score.tier})`;
+    li.innerHTML = `
+      <span class="rank">${i + 1}.</span>
+      <span class="handle">${score.handle}</span>
+      <span class="score-badge ${score.tier}">${score.tier.toUpperCase()}</span>
+      <span class="score-num">${score.total}</span>
+    `;
     topList.appendChild(li);
   }
 }
@@ -96,15 +110,21 @@ async function loadState() {
   const contest = activeContestResp?.contest ?? null;
 
   if (!contest?.contestId) {
-    contestLabel.textContent = 'No supported contest tab active';
-    summaryContent.textContent = 'No data yet';
+    platformBadge.textContent = '-';
+    contestIdText.textContent = 'No supported contest tab active';
+    statTotal.textContent = '-';
+    statLow.textContent = '-';
+    statMedium.textContent = '-';
+    statHigh.textContent = '-';
     freshness.textContent = '';
     showStatus(null);
     renderTop([]);
     return;
   }
 
-  contestLabel.textContent = `${contest.platform}: ${contest.contestId}`;
+  platformBadge.textContent = contest.platform || '-';
+  contestIdText.textContent = contest.contestId || '-';
+
   const scoreKey = `scores:${contest.contestId}`;
   const statusKey = `status:${contest.contestId}`;
   const { [scoreKey]: scorePacket, [statusKey]: contestStatus, settings } = await storageGet([
@@ -117,20 +137,27 @@ async function loadState() {
   showStatus(contestStatus);
 
   if (!scorePacket?.scores) {
-    summaryContent.textContent = 'No data yet';
+    statTotal.textContent = '-';
+    statLow.textContent = '-';
+    statMedium.textContent = '-';
+    statHigh.textContent = '-';
     freshness.textContent = '';
     renderTop([]);
     return;
   }
 
   const summary = summarizeScores(scorePacket.scores);
-  summaryContent.textContent = `Analyzed ${summary.count} users · low ${summary.low} · medium ${summary.medium} · high ${summary.high}`;
+  statTotal.textContent = summary.count;
+  statLow.textContent = summary.low;
+  statMedium.textContent = summary.medium;
+  statHigh.textContent = summary.high;
   freshness.textContent = formatFreshness(scorePacket.ts);
   renderTop(summary.values);
 }
 
 refreshBtn.addEventListener('click', async () => {
   refreshBtn.disabled = true;
+  refreshBtn.textContent = '⏳ Refreshing...';
   showActionError('');
   try {
     const response = await sendRuntimeMessage({ type: 'REFRESH_NOW' });
@@ -142,6 +169,7 @@ refreshBtn.addEventListener('click', async () => {
     showActionError(`Refresh failed: ${error?.message ?? 'unknown error'}`);
   } finally {
     refreshBtn.disabled = false;
+    refreshBtn.textContent = '↻ Refresh';
   }
 });
 
@@ -172,5 +200,5 @@ chrome.storage.onChanged.addListener((_changes, areaName) => {
 });
 
 loadState().catch((error) => {
-  summaryContent.textContent = `Failed to load: ${error?.message ?? 'Unknown error'}`;
+  showActionError(`Failed to load: ${error?.message ?? 'Unknown error'}`);
 });

@@ -3,8 +3,9 @@
 AI-powered cheating detection overlay for competitive programming contest leaderboards.
 
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-blue?logo=google-chrome)
-![Version](https://img.shields.io/badge/version-1.0.0-green)
+![Version](https://img.shields.io/badge/version-1.1.0-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
+![Tests](https://img.shields.io/badge/tests-32%20passed-brightgreen)
 
 > **Risk is not a verdict.** This extension surfaces suspicion signals, not automated verdicts. All detection is explainable, and users can judge signal quality themselves.
 

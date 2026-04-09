@@ -5,34 +5,205 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>SPA Settings</title>
     <style>
+      :root {
+        --bg-primary: #0f1419;
+        --bg-secondary: #1c2128;
+        --bg-tertiary: #242b33;
+        --border-color: #30363d;
+        --text-primary: #e6edf3;
+        --text-secondary: #8b949e;
+        --text-muted: #6e7681;
+        --accent-blue: #58a6ff;
+        --accent-green: #3fb950;
+        --accent-amber: #d29922;
+        --accent-red: #f85149;
+        --accent-purple: #a371f7;
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --transition: 0.2s ease;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Inter, system-ui, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         margin: 24px;
         max-width: 720px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.5;
       }
-      h1 { margin-top: 0; }
+
+      h1 {
+        margin: 0 0 24px;
+        font-size: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      h1 .logo {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+
+      h2 {
+        margin: 0 0 16px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
       .grid {
         display: grid;
-        grid-template-columns: 1fr 120px;
-        gap: 10px 14px;
+        grid-template-columns: 1fr 140px;
+        gap: 12px 16px;
         align-items: center;
       }
-      .card {
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        padding: 14px;
-        margin-bottom: 14px;
+
+      .grid label {
+        font-size: 13px;
+        color: var(--text-secondary);
       }
-      .row { display: flex; align-items: center; gap: 8px; }
-      .muted { color: #6b7280; font-size: 12px; }
-      button { padding: 8px 12px; }
-      #status { margin-top: 10px; }
+
+      .grid .hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        grid-column: 1;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      select {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        color: var(--text-primary);
+        font-size: 13px;
+        width: 100%;
+        transition: border-color var(--transition);
+      }
+
+      input[type="number"]:focus,
+      input[type="text"]:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+      }
+
+      input[type="checkbox"] {
+        width: 40px;
+        height: 22px;
+        appearance: none;
+        background: var(--bg-tertiary);
+        border-radius: 22px;
+        position: relative;
+        cursor: pointer;
+        transition: background var(--transition);
+      }
+
+      input[type="checkbox"]::before {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        background: var(--text-primary);
+        border-radius: 50%;
+        top: 3px;
+        left: 3px;
+        transition: transform var(--transition);
+      }
+
+      input[type="checkbox"]:checked {
+        background: var(--accent-blue);
+      }
+
+      input[type="checkbox"]:checked::before {
+        transform: translateX(18px);
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      button {
+        background: var(--accent-blue);
+        border: none;
+        color: #fff;
+        border-radius: var(--radius-sm);
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+
+      button:hover {
+        background: #4393e6;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      #status {
+        margin-left: 12px;
+        font-size: 12px;
+      }
+
+      #status.success {
+        color: var(--accent-green);
+      }
+
+      #status.error {
+        color: var(--accent-red);
+      }
+
+      .section-note {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--text-muted);
+        font-style: italic;
+      }
+
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .grid input[type="checkbox"] {
+          justify-self: end;
+        }
+      }
     </style>
   </head>
   <body>
-    <h1>Submission Pattern Analyzer — Settings</h1>
+    <h1><span class="logo">🛡️</span> Submission Pattern Analyzer — Settings</h1>
 
     <section class="card">
+      <h2>General</h2>
       <div class="grid">
         <label for="autoScanCodeforces">Auto-scan Codeforces</label>
         <input id="autoScanCodeforces" type="checkbox" />
@@ -94,14 +265,14 @@
         <label for="mlMinConfidence">Min confidence (0-1)</label>
         <input id="mlMinConfidence" type="number" min="0" max="1" step="0.05" />
       </div>
-      <div class="muted">Low-confidence ML output falls back to heuristic score per user.</div>
+      <p class="section-note">Low-confidence ML output falls back to heuristic score per user.</p>
     </section>
 
     <div class="row">
-      <button id="saveBtn" type="button">Save settings</button>
-      <span id="status" class="muted"></span>
+      <button id="saveBtn" type="button">Save Settings</button>
+      <span id="status"></span>
     </div>
 
     <script type="module" src="settings.js"></script>
   </body>
-  </html>
+</html>
