@@ -43,14 +43,16 @@ function buildRiskScore(handle, flags, now, row, snapshot, settings) {
 
   let total = heuristicTotal;
   let mlDetail = null;
+  let mlInfluencedScore = false;
 
   if (ml.enabled) {
     const features = extractMlFeatures({ snapshot, row, heuristicTotal, flags });
     const mlRun = scoreWithModel(features, MODEL_PACK);
     const minConfidence = clamp(Number(mlSettings?.minConfidenceToApply ?? 0), 0, 1);
-    const hasConfidence = Number(mlRun.confidence) >= minConfidence;
+    const hasConfidence = !mlRun.belowMinConfidence && Number(mlRun.confidence) >= minConfidence;
     const mode = ml.mode;
     const blend = clamp(Number(mlSettings?.blend ?? 0), 0, 1);
+    mlInfluencedScore = (mode === 'ml-only' || mode === 'hybrid') && hasConfidence;
 
     if (mode === 'ml-only') {
       total = hasConfidence ? mlRun.mlScore : heuristicTotal;
@@ -76,7 +78,7 @@ function buildRiskScore(handle, flags, now, row, snapshot, settings) {
     };
   }
 
-  if (ml.enabled && ml.mode !== 'heuristic' && mlDetail) {
+  if (ml.enabled && mlInfluencedScore && mlDetail) {
     flags = [...flags, { heuristic: 'ML', weight: 0, detail: mlDetail }];
   }
 

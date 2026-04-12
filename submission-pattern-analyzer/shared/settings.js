@@ -40,6 +40,7 @@ export function mergeDeep(base, patch) {
 
   const out = clone(safeBase);
   for (const [key, value] of Object.entries(patch)) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
     if (isPlainObject(value) && isPlainObject(out[key])) {
       out[key] = mergeDeep(out[key], value);
     } else {

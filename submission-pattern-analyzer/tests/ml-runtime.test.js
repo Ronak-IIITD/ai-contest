@@ -28,6 +28,21 @@ test('returns expected output shape and bounded ranges', () => {
   assert.equal(result.mlScore >= 0 && result.mlScore <= 100, true);
   assert.equal(result.confidence >= 0 && result.confidence <= 1, true);
   assert.equal(Array.isArray(result.topFactors), true);
+  assert.equal(typeof result.belowMinConfidence, 'boolean');
+});
+
+test('belowMinConfidence reflects model threshold', () => {
+  const highConf = scoreWithModel(
+    { heuristic_total_norm: 0.9, rank_percentile: 0.95 },
+    { version: 'test', bias: 5, weights: { heuristic_total_norm: 3, rank_percentile: 2 }, thresholds: { minConfidence: 0.3 } },
+  );
+  assert.equal(highConf.belowMinConfidence, false);
+
+  const lowConf = scoreWithModel(
+    { heuristic_total_norm: 0.1 },
+    { version: 'test', bias: 0, weights: { heuristic_total_norm: 0.01 }, thresholds: { minConfidence: 0.9 } },
+  );
+  assert.equal(lowConf.belowMinConfidence, true);
 });
 
 test('remains numerically stable for extreme linear values', () => {
@@ -75,5 +90,6 @@ test('safely falls back for invalid model pack and features', () => {
   assert.equal(result.probability, 0.5);
   assert.equal(result.mlScore, 50);
   assert.equal(result.confidence, 0.35);
+  assert.equal(result.belowMinConfidence, true);
   assert.deepEqual(result.topFactors, []);
 });

@@ -6,6 +6,7 @@
     status: null,
     contestId: null,
     minTier: 'low',
+    bannerDismissed: false,
   };
 
   const badgeClass = 'spa-risk-badge';
@@ -38,7 +39,7 @@
     if (status.stale) {
       return status.message || 'Data may be stale due to recent fetch failure.';
     }
-    if (status.isPartial || status.partial) {
+    if (status.isPartial) {
       if (status.message) return status.message;
       const fetched = Number(status.fetchedRows);
       const total = Number(status.totalRows);
@@ -89,12 +90,20 @@
       close.textContent = 'Dismiss';
       close.style.cssText =
         'border:1px solid #475569;background:#1e293b;color:#e2e8f0;border-radius:4px;padding:2px 8px;cursor:pointer;';
-      close.addEventListener('click', () => banner.remove());
+      close.addEventListener('click', () => {
+        state.bannerDismissed = true;
+        banner.remove();
+      });
 
       banner.append(content, close);
 
       const table = document.querySelector('table.standings, table');
       table?.parentElement?.insertBefore(banner, table);
+    }
+
+    if (state.bannerDismissed) {
+      banner.style.display = 'none';
+      return;
     }
 
     const values = Object.values(scoresObj || {});
@@ -191,14 +200,14 @@
   let renderTimer = null;
   function scheduleRender() {
     if (renderTimer) return;
-    renderTimer = setTimeout(() => {
+    renderTimer = requestAnimationFrame(() => {
       renderTimer = null;
       try {
         render();
       } catch (error) {
         console.warn('[SPA] Codeforces overlay render failed', error);
       }
-    }, 120);
+    });
   }
 
   function storageGet(keys) {
@@ -209,6 +218,7 @@
 
   async function loadInitial() {
     state.contestId = contestIdFromUrl();
+    state.bannerDismissed = false;
     if (!state.contestId) return;
 
     const scoreKey = `scores:${state.contestId}`;

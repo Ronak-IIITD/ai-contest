@@ -1,7 +1,5 @@
-const contestLabel = document.getElementById('contestLabel');
 const platformBadge = document.getElementById('platformBadge');
 const contestIdText = document.getElementById('contestIdText');
-const summaryContent = document.getElementById('summaryContent');
 const freshness = document.getElementById('freshness');
 const statusNote = document.getElementById('statusNote');
 const topList = document.getElementById('topList');
@@ -55,7 +53,7 @@ function showActionError(message = '') {
 }
 
 function showStatus(status) {
-  if (!status || (!status.stale && !status.isPartial && !status.partial)) {
+  if (!status || (!status.stale && !status.isPartial)) {
     statusNote.hidden = true;
     statusNote.classList.remove('warning', 'error');
     statusNote.textContent = '';
@@ -72,7 +70,7 @@ function showStatus(status) {
     return;
   }
 
-  if (status.isPartial || status.partial) {
+  if (status.isPartial) {
     const fetched = Number(status.fetchedRows);
     const total = Number(status.totalRows);
     if (Number.isFinite(fetched) && Number.isFinite(total)) {
@@ -83,24 +81,40 @@ function showStatus(status) {
   }
 }
 
-function renderTop(values = []) {
+function renderTop(values = [], scoresObj = {}) {
   topList.innerHTML = '';
   const sorted = [...values].sort((a, b) => b.total - a.total).slice(0, 10);
   if (!sorted.length) {
     const li = document.createElement('li');
-    li.textContent = 'No scored users yet';
+    li.textContent =
+      Object.keys(scoresObj || {}).length > 0 ? 'No suspicious users detected' : 'No scan data available';
     topList.appendChild(li);
     return;
   }
   for (let i = 0; i < sorted.length; i++) {
     const score = sorted[i];
     const li = document.createElement('li');
-    li.innerHTML = `
-      <span class="rank">${i + 1}.</span>
-      <span class="handle">${score.handle}</span>
-      <span class="score-badge ${score.tier}">${score.tier.toUpperCase()}</span>
-      <span class="score-num">${score.total}</span>
-    `;
+
+    const rankSpan = document.createElement('span');
+    rankSpan.className = 'rank';
+    rankSpan.textContent = `${i + 1}.`;
+
+    const handleSpan = document.createElement('span');
+    handleSpan.className = 'handle';
+    handleSpan.textContent = score.handle;
+
+    const tierSpan = document.createElement('span');
+    tierSpan.className = `score-badge ${score.tier}`;
+    tierSpan.textContent = score.tier.toUpperCase();
+
+    const totalSpan = document.createElement('span');
+    totalSpan.className = 'score-num';
+    totalSpan.textContent = score.total;
+
+    li.appendChild(rankSpan);
+    li.appendChild(handleSpan);
+    li.appendChild(tierSpan);
+    li.appendChild(totalSpan);
     topList.appendChild(li);
   }
 }
@@ -152,7 +166,7 @@ async function loadState() {
   statMedium.textContent = summary.medium;
   statHigh.textContent = summary.high;
   freshness.textContent = formatFreshness(scorePacket.ts);
-  renderTop(summary.values);
+  renderTop(summary.values, scorePacket.scores);
 }
 
 refreshBtn.addEventListener('click', async () => {
@@ -163,6 +177,9 @@ refreshBtn.addEventListener('click', async () => {
     const response = await sendRuntimeMessage({ type: 'REFRESH_NOW' });
     if (!response?.ok) {
       throw new Error(response?.error || response?.result?.error || 'Refresh failed');
+    }
+    if (response?.result?.skipped) {
+      showActionError(`Skipped: ${response.result.skipped}`);
     }
     await loadState();
   } catch (error) {

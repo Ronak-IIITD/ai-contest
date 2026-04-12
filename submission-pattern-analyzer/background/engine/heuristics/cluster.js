@@ -69,7 +69,7 @@ export function detectSubmissionClusters(snapshot, { weight = 35, memberWeight =
             });
           }
         }
-        break;
+        left = right + 1;
       }
     }
   }

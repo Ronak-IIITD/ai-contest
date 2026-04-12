@@ -97,7 +97,7 @@ async function shouldScan(contestId, intervalSeconds, force = false) {
 async function withContestLock(contestId, runner) {
   if (!contestId) return runner();
   if (CONTEST_LOCKS.has(contestId)) {
-    return { skipped: 'in-flight', contestId };
+    return { ok: true, skipped: 'in-flight', contestId };
   }
 
   const lock = (async () => runner())();
@@ -134,7 +134,6 @@ async function runPipeline({ platform, contestId, contestSlug }, settings) {
   const { scores, clusterEvents } = scoreSnapshot(snapshot, settings);
   const status = {
     stale: false,
-    partial: Boolean(snapshot?.isPartial),
     isPartial: Boolean(snapshot?.isPartial),
     fetchedRows: Number(snapshot?.fetchedRows) || 0,
     totalRows: Number(snapshot?.totalRows) || Number(snapshot?.fetchedRows) || 0,
@@ -165,17 +164,17 @@ async function pollActiveContest({ force = false } = {}) {
   const settings = await getSettings();
 
   const activeContest = await getActiveContest();
-  if (!activeContest?.contestId) return { skipped: 'no-active-contest' };
+  if (!activeContest?.contestId) return { ok: true, skipped: 'no-active-contest' };
 
   if (activeContest.platform === 'codeforces' && !settings.autoScanCodeforces) {
-    return { skipped: 'codeforces-disabled' };
+    return { ok: true, skipped: 'codeforces-disabled' };
   }
   if (activeContest.platform === 'leetcode' && !settings.autoScanLeetCode) {
     return { skipped: 'leetcode-disabled' };
   }
 
   if (!(await shouldScan(activeContest.contestId, settings.scanIntervalSeconds, force))) {
-    return { skipped: 'scan-interval' };
+    return { ok: true, skipped: 'scan-interval' };
   }
 
   return withContestLock(activeContest.contestId, async () => {
@@ -242,7 +241,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
   const run = async () => {
     if (alarm.name === POLL_ALARM) {
-      console.log('tick');
       await pollActiveContest({ force: false });
       return;
     }
@@ -257,8 +255,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   });
 });
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || typeof message !== 'object') return undefined;
+  if (sender.id && sender.id !== chrome.runtime.id) return undefined;
 
   if (message.type === 'REFRESH_NOW') {
     pollActiveContest({ force: true })

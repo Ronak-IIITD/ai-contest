@@ -17,12 +17,12 @@ function clone(value) {
 
 function withContestPayloadMeta(kind, payload) {
   return {
+    ...payload,
     ts: Date.now(),
     _meta: {
       ...CONTEST_PAYLOAD_META,
       kind,
     },
-    ...payload,
   };
 }
 
